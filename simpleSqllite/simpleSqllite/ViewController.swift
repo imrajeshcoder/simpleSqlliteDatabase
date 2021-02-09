@@ -61,17 +61,17 @@ class ViewController: UIViewController {
     
     func insertData() {
        
-
+        
         if sqlite3_prepare_v2(db, "insert into user (name,mobileno) values (?,?)", -1, &statement, nil) != SQLITE_OK {
             let errmsg = String(cString: sqlite3_errmsg(db)!)
             print("error preparing insert: \(errmsg)")
         }
-
-        if sqlite3_bind_text(statement, 1, "\(txtUserName.text)", -1, SQLITE_TRANSIENT) != SQLITE_OK {
+        // txtUserName.text is OPTIONAL taype it must be unwrapped he unwrapped using "!" sign
+        if sqlite3_bind_text(statement, 1, "\(txtUserName.text!)", -1, SQLITE_TRANSIENT) != SQLITE_OK {
             let errmsg = String(cString: sqlite3_errmsg(db)!)
             print("failure binding foo: \(errmsg)")
         }
-        if sqlite3_bind_text(statement, 2, "\(txtMobileNumber.text)", -1, SQLITE_TRANSIENT) != SQLITE_OK {
+        if sqlite3_bind_text(statement, 2, "\(txtMobileNumber.text!)", -1, SQLITE_TRANSIENT) != SQLITE_OK {
             let errmsg = String(cString: sqlite3_errmsg(db)!)
             print("failure binding foo: \(errmsg)")
         }
@@ -93,24 +93,32 @@ class ViewController: UIViewController {
         }
 
         while sqlite3_step(statement) == SQLITE_ROW {
-            let id = sqlite3_column_int64(statement, 0)
-            print("id = \(id) ", terminator: "")
-
-            if let cString = sqlite3_column_text(statement, 1) {
-               
-                let name = String(cString: cString)
-                print(" name = \(name)", terminator: "")
-            } else {
-                print("name not found")
-            }
+//            let id = sqlite3_column_int64(statement, 0)
+//            print("id = \(id) ", terminator: "")
+//
+//            if let cString = sqlite3_column_text(statement, 1) {
+//
+//                let name = String(cString: cString)
+//                print(" name = \(name)", terminator: "")
+//            } else {
+//                print("name not found")
+//            }
+//
+//            if let cString = sqlite3_column_text(statement, 2) {
+//                let  mono = String(cString: cString)
+//                print(" Mobile Number = \(mono)" )
+//            } else {
+//                print("name not found")
+//            }
             
-            if let cString = sqlite3_column_text(statement, 2) {
-                let  mono = String(cString: cString)
-                print(" Mobile Number = \(mono)" )
-            } else {
-                print("name not found")
-            }
+            let id = sqlite3_column_int(statement, 0)
+             let name = String(cString: sqlite3_column_text(statement, 1))
+            let mono = String(cString: sqlite3_column_text(statement, 2))
+           
+            print("id:\(id) NAME:\(name) MONO: \(mono)")
         }
+        
+        
 
         if sqlite3_finalize(statement) != SQLITE_OK {
             let errmsg = String(cString: sqlite3_errmsg(db)!)
